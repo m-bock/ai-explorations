@@ -1,0 +1,34 @@
+package:
+  name: aiaiai
+  dependencies:
+    - console
+    - effect
+    - prelude
+    - node-buffer
+    - node-fs
+    - strings
+    - transformers
+    - tuples
+    - unsafe-coerce
+    - web-workers
+    - either
+    - foldable-traversable
+    - maybe
+    - partial
+    - stadium
+    - ts-bridge
+  test:
+    main: Test.Main
+    dependencies: []
+
+workspace:
+  packageSet:
+    registry: 67.0.1
+  extraPackages:
+    stadium:
+      git: https://github.com/m-bock/purescript-stadium
+      ref: 899cc76d25e1fb8fba63ab1ee52733373908c960
+
+    ts-bridge:
+      git: https://github.com/m-bock/purescript-ts-bridge
+      ref: 7b8d44c9a81b8e84465ed47ec0b99d594d48da17
