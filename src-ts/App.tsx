@@ -1,6 +1,6 @@
 import React from 'react';
 import Plot from 'react-plotly.js';
-import { useStateMachine } from '../../output/StateMachine/index.js';
+import { useStateMachine } from '../output/StateMachine/index.js';
 
 const App = () => {
   //const { state, dispatch } = useStateMachine();

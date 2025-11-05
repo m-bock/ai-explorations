@@ -3,16 +3,26 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "plotly.js": "^2.35.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-plotly.js": "^2.6.0"
+  },
   "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.0",
+    "gh-pages": "^6.3.0",
     "purescript": "^0.15.15",
     "purs-tidy": "^0.11.1",
     "react": "^19.2.0",
-    "spago": "^0.93.44"
+    "spago": "^0.93.44",
+    "vite": "^7.1.12"
   }
 }
