@@ -17,6 +17,7 @@ package:
     - partial
     - stadium
     - ts-bridge
+    - vectors
   test:
     main: Test.Main
     dependencies: []
@@ -31,4 +32,4 @@ workspace:
 
     ts-bridge:
       git: https://github.com/m-bock/purescript-ts-bridge
-      ref: 7b8d44c9a81b8e84465ed47ec0b99d594d48da17
+      ref: 404a35d84b9ee60d9c06d22959460bdef5d779ed

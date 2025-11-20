@@ -11,13 +11,6 @@ import Data.Tuple.Nested (type (/\), (/\))
 
 type Deviation = Int
 
-improveWeights :: Inputs -> Deviation -> Weights -> Weights
-improveWeights { bias, input1, input2 } deviation weights =
-  { biasWeight: weights.biasWeight + deviation * bias
-  , weight1: weights.weight1 + deviation * input1
-  , weight2: weights.weight2 + deviation * input2
-  }
-
 type EpochLogEntry =
   { weights :: Weights
   , inputs :: Inputs
@@ -70,8 +63,15 @@ trainEpoch oldWeights (inputs /\ expectedOutput) = do
   let newWeights = improveWeights inputs deviation oldWeights
   pure newWeights
 
-train' :: Array (Inputs /\ Output) -> Writer EpochLogs Weights
-train' trainingSamples = do
+improveWeights :: Inputs -> Deviation -> Weights -> Weights
+improveWeights { bias, input1, input2 } deviation weights =
+  { biasWeight: weights.biasWeight + deviation * bias
+  , weight1: weights.weight1 + deviation * input1
+  , weight2: weights.weight2 + deviation * input2
+  }
+
+trainEpochs :: Array (Inputs /\ Output) -> Writer EpochLogs Weights
+trainEpochs trainingSamples = do
   foldM trainEpoch { biasWeight: 0, weight1: 0, weight2: 0 } trainingSamples
 
 train :: Array (Inputs /\ Output) -> Weights
@@ -83,4 +83,4 @@ train trainingSamples =
 
 trainWithLog :: Array (Inputs /\ Output) -> (Weights /\ EpochLogs)
 trainWithLog trainingSamples =
-  runWriter (train' trainingSamples)
+  runWriter (trainEpochs trainingSamples)

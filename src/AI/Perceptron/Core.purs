@@ -2,6 +2,9 @@ module AI.Perceptron.Core where
 
 import Prelude
 
+import Data.Int as Int
+import Types (Line)
+
 type Output = Int
 
 type Input = Int
@@ -28,3 +31,9 @@ perceptron { biasWeight, weight1, weight2 } { bias, input1, input2 } =
     sum = resultBias + result1 + result2
   in
     heaviside sum
+
+line :: Weights -> Line
+line { biasWeight, weight1, weight2 } =
+  { slope: -Int.toNumber weight1 / Int.toNumber weight2
+  , yIntercept: -Int.toNumber biasWeight / Int.toNumber weight2
+  }

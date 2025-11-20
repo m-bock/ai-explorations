@@ -1,8 +1,14 @@
 deploy:
     npx gh-pages -d dist
 
-# dev:
-#     npx vite
+dev:
+    npx vite
+
+gen-types:
+    npx spago run -m GenTS.Main
+
+dev2:
+    npx concurrently --names "vite,gen-types" "just dev" "npx chokidar 'src/**/*.purs' -c 'just gen-types'"
 
 # build:
 #     npx vite build --base gcode-viewer

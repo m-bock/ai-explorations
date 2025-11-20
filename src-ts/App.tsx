@@ -1,25 +1,86 @@
-import React from 'react';
-import Plot from 'react-plotly.js';
-import { useStateMachine } from '../output/StateMachine/index.js';
+import React, { useEffect, useMemo } from "react";
+import * as STM from "../output/StateMachine/index.js";
+import {
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ReferenceLine
+} from "recharts";
+import type { Int } from "../output/Prim/index.js";
+import type { Vec } from "../output/Data.Vector2/index.js";
 
-const App = () => {
-  //const { state, dispatch } = useStateMachine();
+const App: React.FC = () => {
+  const { state, dispatch } = STM.useStateMachine();
+
+  useEffect(() => {
+    dispatch.getDots();
+  }, []);
+
+  const all = STM.selAll(state);
+
   return (
-    <Plot
-      data={[
-        {
-          x: [1, 2, 3],
-          y: [2, 6, 3],
-          type: 'scatter',
-          mode: 'lines+markers',
-          marker: { color: 'red' },
-        },
-        { type: 'bar', x: [1, 2, 3], y: [2, 5, 3] },
-      ]}
-      layout={{ width: 320, height: 240, title: { text: 'A Fancy Plot' } }}
-    />
+    <div style={{ width: 320, height: 240 }}>
+      <Chart data={state.dots} linePoints={all.linePoints} />
+    </div>
   );
 };
 
+interface ChartProps {
+  data: { x: Int, y: Int }[];
+  linePoints: { start: Vec<number>, end: Vec<number> };
+}
 
-export default App
+const Chart = ({ data, linePoints }: ChartProps) => {
+  return (
+    <ScatterChart
+      style={{ width: '100%', maxWidth: '700px', maxHeight: '70vh', aspectRatio: 1.618 }}
+      responsive
+      margin={{
+        top: 20,
+        right: 20,
+        bottom: 10,
+        left: 10,
+      }}
+    >
+      <ReferenceLine
+        stroke="green"
+        strokeDasharray="3 3"
+        segment={[
+          STM.vecToRec(linePoints.start),
+          STM.vecToRec(linePoints.end)
+        ]}
+      />
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="x" type="number" domain={[0, 1]} />
+      <YAxis dataKey="y" type="number" width="auto" domain={[0, 1]} />
+      <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+      <Legend />
+      <Scatter data={data} fill="#8884d8" isAnimationActive />
+    </ScatterChart>
+  );
+};
+
+export default App;
+
+
+// function clipLine(m: number, b: number, xMin: number, xMax: number, yMin: number, yMax: number) {
+//   const y1 = m * xMin + b;
+//   const y2 = m * xMax + b;
+
+//   // If both are out of Y range on the same side → no visible segment
+//   if (y1 < yMin && y2 < yMin) return null;
+//   if (y1 > yMax && y2 > yMax) return null;
+
+//   // Clamp to y-range
+//   const c1 = Math.max(yMin, Math.min(yMax, y1));
+//   const c2 = Math.max(yMin, Math.min(yMax, y2));
+
+//   return [
+//     { x: xMin, y: c1 },
+//     { x: xMax, y: c2 },
+//   ];
+// }

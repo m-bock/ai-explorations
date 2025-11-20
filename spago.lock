@@ -20,6 +20,7 @@
             "ts-bridge",
             "tuples",
             "unsafe-coerce",
+            "vectors",
             "web-workers"
           ],
           "build_plan": [
@@ -101,6 +102,7 @@
             "untagged-union",
             "variant",
             "variant-encodings",
+            "vectors",
             "web-events",
             "web-workers"
           ]
@@ -669,7 +671,7 @@
       },
       "ts-bridge": {
         "git": "https://github.com/m-bock/purescript-ts-bridge",
-        "ref": "7b8d44c9a81b8e84465ed47ec0b99d594d48da17"
+        "ref": "404a35d84b9ee60d9c06d22959460bdef5d779ed"
       }
     }
   },
@@ -1581,7 +1583,7 @@
     "ts-bridge": {
       "type": "git",
       "url": "https://github.com/m-bock/purescript-ts-bridge",
-      "rev": "7b8d44c9a81b8e84465ed47ec0b99d594d48da17",
+      "rev": "404a35d84b9ee60d9c06d22959460bdef5d779ed",
       "dependencies": [
         "aff",
         "aff-promise",
@@ -1728,6 +1730,18 @@
         "prelude",
         "unsafe-coerce",
         "variant"
+      ]
+    },
+    "vectors": {
+      "type": "registry",
+      "version": "2.1.0",
+      "integrity": "sha256-tWhJaEwE8Y3EPYMlR8kID4FL+NXRlrPZrZu8g/60lwk=",
+      "dependencies": [
+        "console",
+        "effect",
+        "foldable-traversable",
+        "prelude",
+        "profunctor-lenses"
       ]
     },
     "web-events": {
