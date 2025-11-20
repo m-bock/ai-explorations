@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from "react";
-import * as STM from "../output/StateMachine/index.js";
+import * as stm from "../output/StateMachine";
+import * as int from "../output/Data.Int";
 import {
   ScatterChart,
   Scatter,
@@ -12,19 +13,31 @@ import {
 } from "recharts";
 import type { Int } from "../output/Prim/index.js";
 import type { Vec } from "../output/Data.Vector2/index.js";
+import { Button } from "@/components/ui/button"
+import "@/App.css"
+import { Slider } from "@/components/ui/slider"
 
 const App: React.FC = () => {
-  const { state, dispatch } = STM.useStateMachine();
+  const { state, dispatch } = stm.useStateMachine();
 
   useEffect(() => {
     dispatch.getDots();
   }, []);
 
-  const all = STM.selAll(state);
+  const all = stm.selAll(state);
+
+  console.log("render")
 
   return (
     <div style={{ width: 320, height: 240 }}>
       <Chart data={state.dots} linePoints={all.linePoints} />
+      {int.toNumber(state.epoch)}
+      <div className="flex min-h-svh flex-col items-center justify-center">
+        <Button variant={"destructive"}>Click me</Button>
+        <Slider
+          value={[int.toNumber(state.epoch)]}
+          onValueChange={(values) => dispatch.msg(stm.mkMsg.SetEpoch(int.trunc(values[0] || 0)))} />
+      </div>
     </div>
   );
 };
@@ -50,8 +63,8 @@ const Chart = ({ data, linePoints }: ChartProps) => {
         stroke="green"
         strokeDasharray="3 3"
         segment={[
-          STM.vecToRec(linePoints.start),
-          STM.vecToRec(linePoints.end)
+          stm.vecToRec(linePoints.start),
+          stm.vecToRec(linePoints.end)
         ]}
       />
       <CartesianGrid strokeDasharray="3 3" />

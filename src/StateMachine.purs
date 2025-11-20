@@ -4,18 +4,27 @@ import Prelude
 
 import AI.Perceptron.Core (Weights)
 import AI.Perceptron.Core as Perceptron
+import Data.Array.NonEmpty (NonEmptyArray)
+import Data.Array.NonEmpty as NEA
+import Data.Generic.Rep (class Generic)
+import Data.Maybe (Maybe(..))
 import Data.Vector2 (Vec(..))
 import Effect (Effect)
+import Effect.Uncurried (EffectFn1, mkEffectFn1)
 import GenTS.MyTsBridge (Tok(..))
+import Partial.Unsafe (unsafeCrashWith)
 import Stadium.Core as Stadium
 import Stadium.React (useStateMachineSimple)
-import TsBridge (TsExports, TypeVar, tsExportValues)
+import Stadium.TL (mkConstructors)
+import TsBridge (TsExports, TypeVar, tsBridgeOpaqueType, tsExportValues)
+import TsBridge.ClassVia (class TsBridgeVia)
 import Types (Range, Line)
 import Unsafe.Coerce (unsafeCoerce)
 
 type State =
   { dots :: Array { x :: Int, y :: Int }
-  , weights :: Weights
+  , weights :: NonEmptyArray Weights
+  , epoch :: Int
   , domain :: Vec (Range Number)
   }
 
@@ -25,7 +34,8 @@ type DerivedState =
 selAll :: State -> DerivedState
 selAll state =
   let
-    line = Perceptron.line state.weights
+    currentWeights = getMod state.weights state.epoch
+    line = Perceptron.line currentWeights
   in
     { linePoints: getLinePoints line state.domain }
 
@@ -44,18 +54,29 @@ vecToRec (Vec x y) = { x, y }
 init :: State
 init =
   { dots: []
-  , weights: { biasWeight: 0, weight1: 0, weight2: 0 }
+  , weights: pure { biasWeight: 0, weight1: 0, weight2: 0 }
   , domain: Vec { min: 0.0, max: 1.0 } { min: 0.0, max: 1.0 }
+  , epoch: 0
   }
 
-data Msg = GotDots (Array { x :: Int, y :: Int })
+data Msg
+  = GotDots (Array { x :: Int, y :: Int })
+  | SetEpoch Int
+
+derive instance Generic Msg _
+
+mkMsg :: _
+mkMsg = mkConstructors @Msg
 
 update :: Msg -> State -> State
 update msg state = case msg of
   GotDots dots -> state { dots = dots }
+  SetEpoch epoch -> state { epoch = epoch }
 
 type Dispatchers =
   { getDots :: Effect Unit
+  , setEpoch :: Int -> Effect Unit
+  , msg :: EffectFn1 Msg Unit
   }
 
 dispatchers :: Stadium.DispatcherApi Msg State Unit -> Dispatchers
@@ -66,7 +87,16 @@ dispatchers api =
       , { x: 1, y: 0 }
       , { x: 1, y: 1 }
       ]
+  , setEpoch: api.emitMsg <<< SetEpoch
+  , msg: mkEffectFn1 api.emitMsg
   }
+
+getMod :: forall a. NonEmptyArray a -> Int -> a
+getMod array index = case NEA.index array modIndex of
+  Just value -> value
+  Nothing -> unsafeCrashWith "getMod: Index out of bounds"
+  where
+  modIndex = index `mod` (NEA.length array)
 
 ---
 
@@ -86,4 +116,12 @@ tsExports = tsExportValues Tok
   , selYs
   , selAll
   , vecToRec: vecToRec :: Vec (TypeVar "A") -> _
+  , mkMsg
   }
+
+instance TsBridgeVia Tok Msg where
+  tsBridgeVia _ = tsBridgeOpaqueType
+    { moduleName: "StateMachine"
+    , typeName: "Msg"
+    , typeArgs: []
+    }

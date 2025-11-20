@@ -6,6 +6,7 @@ import Prelude
 
 import DTS as DTS
 import Data.Either (Either)
+import Data.Int as Data.Int
 import Data.Vector2 as Data.Vector2
 import Effect (Effect)
 import GenTS.MyTsBridge (Tok(..))
@@ -21,6 +22,12 @@ myTsProgram =
         { vec: Data.Vector2.vec :: TypeVar "A" -> _
         }
         "Data.Vector2"
+    , tsExportValues Tok
+        { toNumber: Data.Int.toNumber
+        , trunc: Data.Int.trunc
+        }
+        "Data.Int"
+
     ]
 
 main :: Effect Unit
